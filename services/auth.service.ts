@@ -26,6 +26,31 @@ export class AuthService {
         return await response.json();
     }
 
+    async google_init(redirectUri: string): Promise<{ google_uri: string }> {
+        const response = await fetch(`${API_BASE_URL}/users/google/init?redirect_uri=${encodeURIComponent(redirectUri)}`, {
+            method: "POST",
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to get Google auth URL");
+        }
+
+        return await response.json();
+    }
+
+    async google_callback(code: string): Promise<{ access_token: string }> {
+        const response = await fetch(`${API_BASE_URL}/users/google?code=${encodeURIComponent(code)}`, {
+            method: "POST",
+        });
+
+        if (!response.ok) {
+            throw new Error("Google callback failed");
+        }
+
+        return await response.json();
+    }
+
+
     logout(): void {
         // Simulate user logout
         console.log("User logged out");

@@ -1,22 +1,8 @@
-"use client"
-
 import * as React from "react"
-import {
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react"
+import { Plus } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavSecondary } from "@/components/nav-secondary"
+import { Calendars } from "@/components/calendars"
+import { DatePicker } from "@/components/date-picker"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -26,165 +12,55 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
+  SidebarSeparator,
 } from "@/components/ui/sidebar"
 
+// This is sample data.
 const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  navMain: [
+  calendars: [
     {
-      title: "Calendar",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Events",
-          url: "#",
-        },
-        {
-          title: "Manage Calendar",
-          url: "#",
-        },
-      ],
-    },
-    
-    {
-      title: "Tools Integrations",
-      url: "#",
-      icon: Bot,
-      isActive: true,
-      items: [
-        {
-          title: "Gmail",
-          url: "#",
-        },
-        {
-          title: "Slack",
-          url: "#",
-        },
-        {
-          title: "Github",
-          url: "#",
-        },
-            {
-          title: "Jira",
-          url: "#",
-        },
-      ],
+      name: "My Calendars",
+      items: ["Personal", "Work", "Family"],
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      name: "Favorites",
+      items: ["Holidays", "Birthdays"],
     },
     {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      name: "Other",
+      items: ["Travel", "Reminders", "Deadlines"],
     },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ userData,  ...props }: { userData: { name: string; email: string; picture: string } } & React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar
-      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
-      {...props}
-    >
-      <SidebarHeader>
+    <Sidebar {...props}>
+      <SidebarHeader className="border-sidebar-border h-16 border-b">
+        <NavUser user={userData} />
+      </SidebarHeader>
+      <SidebarContent>
+        <DatePicker />
+        <SidebarSeparator className="mx-0" />
+        <Calendars calendars={data.calendars} />
+      </SidebarContent>
+      <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
-              </a>
+            <SidebarMenuButton>
+              <Plus />
+              <span>New Calendar</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }

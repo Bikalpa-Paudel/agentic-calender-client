@@ -1,33 +1,63 @@
+import { cookies } from "next/headers"
+import {jwtDecode} from "jwt-decode"
 import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
   SidebarProvider,
+  SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-export const iframeHeight = "800px"
+export default async function Page() {
+    
+  const cookieStore = await cookies();
+  const access_token = cookieStore.get("access_token")?.value || null;
+  let userData = null;
+  if (access_token) {
 
-export const description = "A sidebar with a header and a search form."
+    const decoded = jwtDecode(access_token);
+    userData = decoded as { sub: string; email: string; name: string; picture: string;  };
 
-export default function Page() {
+  }
+  else {
+    userData = {
+      name: "Guest User",
+      email: "n@example.com",
+      picture: "/avatars/guest.jpg",
+    };
+  }
   return (
-    <div className="[--header-height:calc(--spacing(14))]">
-      <SidebarProvider className="flex flex-col">
-        <SiteHeader />
-        <div className="flex flex-1">
-          <AppSidebar />
-          <SidebarInset>
-            <div className="flex flex-1 flex-col gap-4 p-4">
-              <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div className="bg-muted/50 aspect-video rounded-xl" />
-                <div className="bg-muted/50 aspect-video rounded-xl" />
-                <div className="bg-muted/50 aspect-video rounded-xl" />
-              </div>
-              <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-            </div>
-          </SidebarInset>
+    <SidebarProvider>
+      <AppSidebar userData={userData} />
+      <SidebarInset>
+        <header className="bg-background sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-[orientation=vertical]:h-4"
+          />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbPage>October 2024</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-5">
+            {Array.from({ length: 20 }).map((_, i) => (
+              <div key={i} className="bg-muted/50 aspect-square rounded-xl" />
+            ))}
+          </div>
         </div>
-      </SidebarProvider>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
