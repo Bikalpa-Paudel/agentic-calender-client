@@ -13,7 +13,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-
+import { CalendarService } from "@/services/calendar.service"
+import Calendar from "@/components/CalendarView"
 export default async function Page() {
     
   const cookieStore = await cookies();
@@ -32,9 +33,14 @@ export default async function Page() {
       picture: "/avatars/guest.jpg",
     };
   }
+
+  const calendarService = new CalendarService();
+  const calendars = access_token ? await calendarService.getCalendars(access_token) : [];
+
+
   return (
     <SidebarProvider>
-      <AppSidebar userData={userData} />
+      <AppSidebar userData={userData} calendars={calendars} />
       <SidebarInset>
         <header className="bg-background sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
@@ -50,13 +56,14 @@ export default async function Page() {
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
+        <Calendar />
+        {/* <div className="flex flex-1 flex-col gap-4 p-4">
           <div className="grid auto-rows-min gap-4 md:grid-cols-5">
             {Array.from({ length: 20 }).map((_, i) => (
               <div key={i} className="bg-muted/50 aspect-square rounded-xl" />
             ))}
           </div>
-        </div>
+        </div> */}
       </SidebarInset>
     </SidebarProvider>
   )

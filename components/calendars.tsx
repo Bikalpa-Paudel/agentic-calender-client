@@ -19,16 +19,13 @@ import {
 export function Calendars({
   calendars,
 }: {
-  calendars: {
-    name: string
-    items: string[]
-  }[]
+  calendars: any[]
 }) {
   return (
     <>
       {calendars.map((calendar, index) => (
-        <React.Fragment key={calendar.name}>
-          <SidebarGroup key={calendar.name} className="py-0">
+        <React.Fragment key={calendar.summary}>
+          <SidebarGroup key={calendar.summary} className="py-0">
             <Collapsible
               defaultOpen={index === 0}
               className="group/collapsible"
@@ -38,13 +35,13 @@ export function Calendars({
                 className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground w-full text-sm"
               >
                 <CollapsibleTrigger>
-                  {calendar.name}{" "}
+                  {calendar.summary}{" "}
                   <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
               <CollapsibleContent>
                 <SidebarGroupContent>
-                  <SidebarMenu>
+                  {/* <SidebarMenu>
                     {calendar.items.map((item, index) => (
                       <SidebarMenuItem key={item}>
                         <SidebarMenuButton>
@@ -58,7 +55,7 @@ export function Calendars({
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
-                  </SidebarMenu>
+                  </SidebarMenu> */}
                 </SidebarGroupContent>
               </CollapsibleContent>
             </Collapsible>

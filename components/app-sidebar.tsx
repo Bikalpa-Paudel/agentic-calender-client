@@ -39,7 +39,7 @@ const data = {
   ],
 }
 
-export function AppSidebar({ userData,  ...props }: { userData: { name: string; email: string; picture: string } } & React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ userData, calendars, ...props }: { userData: { name: string; email: string; picture: string }, calendars: any[] } & React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarHeader className="border-sidebar-border h-16 border-b">
@@ -48,7 +48,7 @@ export function AppSidebar({ userData,  ...props }: { userData: { name: string; 
       <SidebarContent>
         <DatePicker />
         <SidebarSeparator className="mx-0" />
-        <Calendars calendars={data.calendars} />
+        <Calendars calendars={calendars} />
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
