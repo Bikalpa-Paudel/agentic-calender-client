@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { CalendarService } from "@/services/calendar.service"
-import Calendar from "@/components/CalendarView"
+import {Calendar } from "@/components/calendar/Calendar"
 export default async function Page() {
     
   const cookieStore = await cookies();
