@@ -70,7 +70,7 @@ export function WeekView({
             All day
           </div>
           {days.map((day) => {
-            const allDayEvents = getEventsForDate(day).filter((e) => e.allDay);
+            const allDayEvents = getEventsForDate(day).filter((e) => e.is_all_day);
             return (
               <div
                 key={day.toISOString()}
@@ -104,7 +104,7 @@ export function WeekView({
               </div>
               {days.map((day) => {
                 const dayEvents = getEventsForDate(day).filter(
-                  (e) => !e.allDay && e.startTime?.startsWith(String(hour).padStart(2, '0'))
+                  (e) => !e.is_all_day && e.startTime?.startsWith(String(hour).padStart(2, '0'))
                 );
                 return (
                   <div

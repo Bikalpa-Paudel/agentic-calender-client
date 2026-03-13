@@ -1,14 +1,11 @@
-import { Calendar } from "@/components/ui/calendar"
-import {
-  SidebarGroup,
-  SidebarGroupContent,
-} from "@/components/ui/sidebar"
+"use client";
+
+import { Calendar } from "@/components/ui/calendar";
+
 export function DatePicker() {
   return (
-    <SidebarGroup className="px-0">
-      <SidebarGroupContent>
-        <Calendar className="[&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground [&_[role=gridcell]]:w-[33px]" />
-      </SidebarGroupContent>
-    </SidebarGroup>
-  )
+    <div className="px-0">
+      <Calendar className="[&_[role=gridcell].bg-accent]:bg-primary [&_[role=gridcell].bg-accent]:text-primary-foreground [&_[role=gridcell]]:w-[33px]" />
+    </div>
+  );
 }

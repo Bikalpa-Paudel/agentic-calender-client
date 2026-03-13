@@ -22,7 +22,7 @@ export function DayView({
   onAddEvent,
 }: DayViewProps) {
   const events = getEventsForDate(currentDate);
-  const allDayEvents = events.filter((e) => e.allDay);
+  const allDayEvents = events.filter((e) => e.is_all_day);
   const today = isToday(currentDate);
 
   return (
@@ -74,7 +74,7 @@ export function DayView({
       <div className="space-y-0">
         {hours.map((hour) => {
           const hourEvents = events.filter(
-            (e) => !e.allDay && e.startTime?.startsWith(String(hour).padStart(2, '0'))
+            (e) => !e.is_all_day && e.startTime?.startsWith(String(hour).padStart(2, '0'))
           );
           return (
             <div key={hour} className="flex gap-4 group">

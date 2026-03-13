@@ -26,7 +26,7 @@ export function EventBadge({ event, compact = false, onClick }: EventBadgeProps)
         compact ? 'truncate' : 'line-clamp-2'
       )}
     >
-      {!event.allDay && event.startTime && (
+      {!event.is_all_day && event.startTime && (
         <span className="opacity-75 mr-1">{event.startTime}</span>
       )}
       {event.title}

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   startOfMonth,
   endOfMonth,
@@ -17,53 +17,56 @@ import {
   isSameMonth,
   format,
 } from 'date-fns';
-import { CalendarEvent, ViewMode, EventColor } from '@/types/calendar';
-
-const generateId = () => Math.random().toString(36).substring(2, 11);
-
-// Sample events for demo
-const initialEvents: CalendarEvent[] = [
-  {
-    id: generateId(),
-    title: 'Team Standup',
-    description: 'Daily team sync meeting',
-    date: new Date(),
-    startTime: '09:00',
-    endTime: '09:30',
-    color: 'sky',
-  },
-  {
-    id: generateId(),
-    title: 'Project Review',
-    description: 'Quarterly project review with stakeholders',
-    date: new Date(),
-    startTime: '14:00',
-    endTime: '15:30',
-    color: 'violet',
-  },
-  {
-    id: generateId(),
-    title: 'Lunch with Client',
-    date: addDays(new Date(), 2),
-    startTime: '12:00',
-    endTime: '13:30',
-    color: 'coral',
-  },
-  {
-    id: generateId(),
-    title: 'Workshop',
-    description: 'Design thinking workshop',
-    date: addDays(new Date(), 5),
-    allDay: true,
-    color: 'emerald',
-  },
-];
+import { CalendarEvent, CalendarEventCreate, CalendarEventUpdate, ViewMode } from '@/types/calendar';
+import { calendarService } from '@/services/calendar.service';
 
 export function useCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('month');
-  const [events, setEvents] = useState<CalendarEvent[]>(initialEvents);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // ── Fetch events from API whenever the visible range changes ──
+  const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Compute visible time window
+      let rangeStart: Date;
+      let rangeEnd: Date;
+      if (viewMode === 'year') {
+        rangeStart = new Date(currentDate.getFullYear(), 0, 1);
+        rangeEnd = new Date(currentDate.getFullYear(), 11, 31, 23, 59, 59);
+      } else if (viewMode === 'month') {
+        rangeStart = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 0 });
+        rangeEnd = endOfWeek(endOfMonth(currentDate), { weekStartsOn: 0 });
+      } else if (viewMode === 'week') {
+        rangeStart = startOfWeek(currentDate, { weekStartsOn: 0 });
+        rangeEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
+      } else {
+        rangeStart = new Date(currentDate);
+        rangeStart.setHours(0, 0, 0, 0);
+        rangeEnd = new Date(currentDate);
+        rangeEnd.setHours(23, 59, 59, 999);
+      }
+      const data = await calendarService.getEvents(
+        rangeStart.toISOString(),
+        rangeEnd.toISOString()
+      );
+      setEvents(data);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to load events';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentDate, viewMode]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const monthDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 0 });
@@ -125,30 +128,48 @@ export function useCalendar() {
   );
 
   const addEvent = useCallback(
-    (event: Omit<CalendarEvent, 'id'>) => {
-      const newEvent: CalendarEvent = {
-        ...event,
-        id: generateId(),
-      };
-      setEvents((prev) => [...prev, newEvent]);
-      return newEvent;
+    async (event: CalendarEventCreate) => {
+      setError(null);
+      try {
+        const created = await calendarService.createEvent(event);
+        setEvents((prev) => [...prev, created]);
+        return created;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to create event';
+        setError(msg);
+        throw err;
+      }
     },
     []
   );
 
   const updateEvent = useCallback(
-    (id: string, updates: Partial<Omit<CalendarEvent, 'id'>>) => {
-      setEvents((prev) =>
-        prev.map((event) =>
-          event.id === id ? { ...event, ...updates } : event
-        )
-      );
+    async (id: number, updates: CalendarEventUpdate) => {
+      setError(null);
+      try {
+        const updated = await calendarService.updateEvent(id, updates);
+        setEvents((prev) =>
+          prev.map((event) => (event.id === id ? updated : event))
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to update event';
+        setError(msg);
+        throw err;
+      }
     },
     []
   );
 
-  const deleteEvent = useCallback((id: string) => {
-    setEvents((prev) => prev.filter((event) => event.id !== id));
+  const deleteEvent = useCallback(async (id: number) => {
+    setError(null);
+    try {
+      await calendarService.deleteEvent(id);
+      setEvents((prev) => prev.filter((event) => event.id !== id));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete event';
+      setError(msg);
+      throw err;
+    }
   }, []);
 
   const getHeaderText = useCallback(() => {
@@ -158,7 +179,7 @@ export function useCalendar() {
       case 'week':
         return format(currentDate, 'MMMM yyyy');
       case 'month':
-        return format(currentDate, 'MMMM yyyy');
+        return format(currentDate, 'MMMM, yyyy');
       case 'year':
         return format(currentDate, 'yyyy');
     }
@@ -169,6 +190,8 @@ export function useCalendar() {
     selectedDate,
     viewMode,
     events,
+    loading,
+    error,
     monthDays,
     weekDays,
     setCurrentDate,
@@ -181,6 +204,7 @@ export function useCalendar() {
     addEvent,
     updateEvent,
     deleteEvent,
+    fetchEvents,
     getHeaderText,
     isSameMonth: (date: Date) => isSameMonth(date, currentDate),
     isToday: (date: Date) => isSameDay(date, new Date()),

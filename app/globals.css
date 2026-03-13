@@ -211,3 +211,54 @@
     border-radius: 3px;
   }
 }
+
+/* ── Event color badge styles ── */
+.event-coral {
+  background-color: hsl(var(--event-coral-light));
+  color: hsl(var(--event-coral));
+  border-left: 3px solid hsl(var(--event-coral));
+}
+.event-violet {
+  background-color: hsl(var(--event-violet-light));
+  color: hsl(var(--event-violet));
+  border-left: 3px solid hsl(var(--event-violet));
+}
+.event-emerald {
+  background-color: hsl(var(--event-emerald-light));
+  color: hsl(var(--event-emerald));
+  border-left: 3px solid hsl(var(--event-emerald));
+}
+.event-amber {
+  background-color: hsl(var(--event-amber-light));
+  color: hsl(var(--event-amber));
+  border-left: 3px solid hsl(var(--event-amber));
+}
+.event-sky {
+  background-color: hsl(var(--event-sky-light));
+  color: hsl(var(--event-sky));
+  border-left: 3px solid hsl(var(--event-sky));
+}
+.event-rose {
+  background-color: hsl(var(--event-rose-light));
+  color: hsl(var(--event-rose));
+  border-left: 3px solid hsl(var(--event-rose));
+}
+
+/* ── Animations ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* ── Shadows ── */
+.shadow-event {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-calendar-hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
